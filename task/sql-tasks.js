@@ -43,7 +43,16 @@ async function task_1_1(db) {
  *
  */
 async function task_1_2(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            OrderID as 'Order Id',
+            sum(Quantity * UnitPrice) AS 'Order Total Price',
+            ROUND(sum(Quantity * Discount) * 100 / sum (UnitPrice * Quantity), 3) AS 'Total Order Discount, %'
+        FROM OrderDetails
+        GROUP BY OrderID
+        ORDER BY OrderId DESC;
+`);
+    return result[0];
 }
 
 /**
@@ -54,7 +63,14 @@ async function task_1_2(db) {
  *
  */
 async function task_1_3(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        CustomerId,
+        CompanyName
+    FROM Customers
+    WHERE Country = 'USA' AND Fax IS NULL
+    `);
+    return result[0];
 }
 
 /**
@@ -67,7 +83,16 @@ async function task_1_3(db) {
  *
  */
 async function task_1_4(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+        Customers.CustomerID AS 'Customer Id',
+        count(OrderID) AS 'Total number of Orders',
+        ROUND( count(OrderID) * 100 / (SELECT count(OrderID) FROM Orders), 5) AS '% of all orders'
+    FROM Customers JOIN Orders ON Customers.CustomerId = Orders.CustomerId
+    GROUP BY Customers.CustomerID
+    ORDER BY count(OrderID) * 100 / (SELECT count(OrderID) from Orders) DESC, Customers.CustomerId;
+    `);
+    return result[0];
 }
 
 /**
@@ -78,7 +103,16 @@ async function task_1_4(db) {
  *
  */
 async function task_1_5(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+        ProductId,
+        ProductName,
+        QuantityPerUnit
+    FROM Products
+    WHERE ProductName LIKE 'A%' OR ProductName LIKE 'B%' OR ProductName LIKE 'C%' OR ProductName LIKE 'D%' OR ProductName LIKE 'E%' OR ProductName LIKE 'F%'
+    ORDER BY ProductName;
+    `);
+    return result[0]
 }
 
 /**
@@ -91,7 +125,17 @@ async function task_1_5(db) {
  *
  */
 async function task_1_6(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        ProductName,
+        CategoryName,
+        CompanyName AS SupplierCompanyName
+    FROM Products 
+    JOIN Suppliers ON  Products.SupplierID = Suppliers.SupplierID 
+    JOIN Categories ON Products.CategoryID = Categories.CategoryID
+    ORDER BY ProductName, Suppliers.CompanyName;
+    `);
+    return result[0];
 }
 
 /**
@@ -105,7 +149,17 @@ async function task_1_6(db) {
  *
  */
 async function task_1_7(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        sub.EmployeeId,
+        concat(sub.FirstName, ' ', sub.LastName) AS 'FullName',
+        ifnull(concat(shief.FirstName, ' ', shief.LastName), '-') AS 'ReportsTo'
+    FROM Employees AS sub
+    LEFT JOIN Employees AS shief ON sub.ReportsTo = shief.EmployeeID
+    ORDER BY sub.EmployeeID;
+    `);
+    return result[0]
+
 }
 
 /**
@@ -117,19 +171,32 @@ async function task_1_7(db) {
  *
  */
 async function task_1_8(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+        CategoryName,
+        count(ProductID) AS 'TotalNumberOfProducts'
+    FROM Categories JOIN Products ON Categories.CategoryID = Products.CategoryID
+    GROUP BY CategoryName
+    `);
+    return result[0]
 }
 
 /**
  *
- * Create a SQL query to find those customers whose contact name containing the 1st character is 'F' and the 4th character is 'n' and rests may be any character.
+ * Create a SQL query to find those customers whose contact name containing the 1st character is 'F' and the 4th character is 'n' and may be any character.
  * | CustomerID | ContactName |
  *
  * @return {array}
  *
  */
 async function task_1_9(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        CustomerID,
+        ContactName
+    FROM Customers WHERE ContactName LIKE 'F%%n%';
+    `);
+    return result[0];
 }
 
 /**
@@ -140,7 +207,13 @@ async function task_1_9(db) {
  *
  */
 async function task_1_10(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        ProductID,
+        ProductName
+    FROM Products WHERE Discontinued = 1;
+    `);
+    return result[0];
 }
 
 /**
@@ -153,7 +226,14 @@ async function task_1_10(db) {
  *
  */
 async function task_1_11(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        ProductName,
+        UnitPrice
+    FROM Products WHERE UnitPrice >= 5 AND UnitPrice <= 15
+    ORDER BY UnitPrice, ProductName
+    `);
+    return result[0];
 }
 
 /**
@@ -166,9 +246,18 @@ async function task_1_11(db) {
  *
  */
 async function task_1_12(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+    ProductName,
+    UnitPrice
+    FROM (SELECT ProductName, UnitPrice 
+            FROM Products 
+            ORDER BY UnitPrice DESC
+            LIMIT 20) AS Products
+    ORDER BY UnitPrice, ProductName;
+    `);
+    return result[0];
 }
-
 /**
  * Create a SQL query to count current and discontinued products:
  * | TotalOfCurrentProducts | TotalOfDiscontinuedProducts |
@@ -177,7 +266,13 @@ async function task_1_12(db) {
  *
  */
 async function task_1_13(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+        count(ProductID) AS TotalOfCurrentProducts,
+        sum(Discontinued) AS TotalOfDiscontinuedProducts
+    FROM Products;
+    `);
+    return result[0];
 }
 
 /**
@@ -188,7 +283,15 @@ async function task_1_13(db) {
  *
  */
 async function task_1_14(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        ProductName,
+        UnitsOnOrder,
+        UnitsInStock
+    FROM Products
+    WHERE UnitsOnOrder > UnitsInStock;
+    `);
+    return result[0];
 }
 
 /**
@@ -199,9 +302,24 @@ async function task_1_14(db) {
  *
  */
 async function task_1_15(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        sum(month(OrderDate)=1) AS 'January',
+        sum(month(OrderDate)=2) AS 'February',
+        sum(month(OrderDate)=3) AS 'March',
+        sum(month(OrderDate)=4) AS 'April',
+        sum(month(OrderDate)=5) AS 'May',
+        sum(month(OrderDate)=6) AS 'June',
+        sum(month(OrderDate)=7) AS 'July',
+        sum(month(OrderDate)=8) AS 'August',
+        sum(month(OrderDate)=9) AS 'September',
+        sum(month(OrderDate)=10) AS 'October',
+        sum(month(OrderDate)=11) AS 'November',
+        sum(month(OrderDate)=12) AS 'December'
+    FROM Orders WHERE year(OrderDate)=1997;
+    `);
+    return result[0];
 }
-
 /**
  * Create a SQL query to return all orders where ship postal code is provided:
  * | OrderID | CustomerID | ShipCountry |
@@ -210,7 +328,14 @@ async function task_1_15(db) {
  *
  */
 async function task_1_16(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        OrderID,
+        CustomerID,
+        ShipCountry
+    FROM Orders WHERE ShipPostalCode IS NOT NULL;
+    `);
+    return result[0]
 }
 
 /**
@@ -223,7 +348,15 @@ async function task_1_16(db) {
  *
  */
 async function task_1_17(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        CategoryName,
+        avg(UnitPrice) AS 'AvgPrice'
+    FROM Categories JOIN Products ON Categories.CategoryID = Products.CategoryID
+    GROUP BY CategoryName
+    ORDER BY avg(UnitPrice) DESC, CategoryName;
+    `);
+    return result[0];
 }
 
 /**
@@ -235,7 +368,14 @@ async function task_1_17(db) {
  *
  */
 async function task_1_18(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+        date_format(OrderDate, '%Y-%m-%d %T') AS 'OrderDate',
+        count(OrderID) AS 'Total Number of Orders'
+    FROM Orders WHERE year(OrderDate)=1998
+    GROUP BY OrderDate;
+    `);
+    return result[0];
 }
 
 /**
@@ -247,7 +387,17 @@ async function task_1_18(db) {
  *
  */
 async function task_1_19(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT
+        Customers.CustomerID,
+        CompanyName,
+        sum(UnitPrice * Quantity) AS 'TotalOrdersAmount, $'
+    FROM Customers JOIN Orders ON Customers.CustomerID = Orders.CustomerID JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+    GROUP BY Customers.CustomerID
+    HAVING sum(UnitPrice * Quantity) > 10000
+    ORDER BY sum(UnitPrice * Quantity) DESC, CustomerID;
+    `);
+    return result[0];
 }
 
 /**
@@ -259,9 +409,20 @@ async function task_1_19(db) {
  *
  */
 async function task_1_20(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+        Employees.EmployeeID,
+        concat(FirstName, ' ', LastName) AS 'Employee Full Name',
+        sum(UnitPrice * Quantity) AS 'Amount, $'
+    FROM Employees 
+    JOIN Orders ON Employees.EmployeeID = Orders.EmployeeID 
+    JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+    GROUP BY Employees.EmployeeID
+    ORDER BY sum(UnitPrice * Quantity) DESC
+    LIMIT 1;
+    `);
+    return result[0];
 }
-
 /**
  * Write a SQL statement to get the maximum purchase amount of all the orders.
  * | OrderID | Maximum Purchase Amount, $ |
@@ -269,7 +430,16 @@ async function task_1_20(db) {
  * @return {array}
  */
 async function task_1_21(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT 
+        OrderID,
+        sum(UnitPrice * Quantity) AS 'Maximum Purchase Amount, $'
+    FROM OrderDetails
+    GROUP BY OrderID
+    ORDER BY sum(UnitPrice * Quantity) DESC
+    LIMIT 1;
+    `);
+    return result[0];
 }
 
 /**
@@ -280,7 +450,26 @@ async function task_1_21(db) {
  * @return {array}
  */
 async function task_1_22(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT DISTINCT
+	    Customers.CompanyName,
+        Products.ProductName,
+        OrderDetails.UnitPrice AS PricePerItem
+    FROM Customers
+    JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+    JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+    JOIN Products ON OrderDetails.ProductID = Products.ProductID
+    WHERE OrderDetails.UnitPrice = (
+                SELECT 
+                    max(ordDet.UnitPrice)
+				FROM Customers AS cust
+                JOIN Orders as ord ON cust.CustomerID = ord.CustomerID
+                JOIN OrderDetails ordDet ON ord.OrderID = ordDet.OrderID
+                WHERE Customers.CustomerID = cust.CustomerID
+    )
+    ORDER BY OrderDetails.UnitPrice DESC, Customers.CompanyName, Products.ProductName
+    `);
+    return result[0]
 }
 
 module.exports = {
