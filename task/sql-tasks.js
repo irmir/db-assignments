@@ -176,7 +176,7 @@ async function task_1_8(db) {
         CategoryName,
         count(ProductID) AS 'TotalNumberOfProducts'
     FROM Categories JOIN Products ON Categories.CategoryID = Products.CategoryID
-    GROUP BY CategoryID
+    GROUP BY Categories.CategoryID
     `);
     return result[0]
 }
