@@ -175,7 +175,8 @@ async function task_1_8(db) {
     SELECT 
         CategoryName,
         count(ProductID) AS 'TotalNumberOfProducts'
-    FROM Categories JOIN Products ON Categories.CategoryID = Products.CategoryID
+    FROM Categories 
+    LEFT JOIN Products ON Products.CategoryID = Categories.CategoryID
     GROUP BY Categories.CategoryID
     `);
     return result[0]
