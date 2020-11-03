@@ -85,12 +85,12 @@ async function task_1_3(db) {
 async function task_1_4(db) {
     let result = await db.query(`
     SELECT 
-        Customers.CustomerID AS 'Customer Id',
+        CustomerID AS 'Customer Id',
         count(OrderID) AS 'Total number of Orders',
         ROUND( count(OrderID) * 100 / (SELECT count(OrderID) FROM Orders), 5) AS '% of all orders'
-    FROM Customers JOIN Orders ON Customers.CustomerId = Orders.CustomerId
-    GROUP BY Customers.CustomerID
-    ORDER BY count(OrderID) * 100 / (SELECT count(OrderID) from Orders) DESC, Customers.CustomerId;
+    FROM Orders
+    GROUP BY CustomerID
+    ORDER BY \`% of all orders\`  DESC, CustomerId;
     `);
     return result[0];
 }
@@ -109,7 +109,7 @@ async function task_1_5(db) {
         ProductName,
         QuantityPerUnit
     FROM Products
-    WHERE ProductName LIKE 'A%' OR ProductName LIKE 'B%' OR ProductName LIKE 'C%' OR ProductName LIKE 'D%' OR ProductName LIKE 'E%' OR ProductName LIKE 'F%'
+    WHERE ProductName REGEXP '^[A-F]'
     ORDER BY ProductName;
     `);
     return result[0]
@@ -396,7 +396,7 @@ async function task_1_19(db) {
     FROM Customers JOIN Orders ON Customers.CustomerID = Orders.CustomerID JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
     GROUP BY Customers.CustomerID
     HAVING sum(UnitPrice * Quantity) > 10000
-    ORDER BY sum(UnitPrice * Quantity) DESC, CustomerID;
+    ORDER BY \`TotalOrdersAmount, $\` DESC, CustomerID;
     `);
     return result[0];
 }
@@ -437,7 +437,7 @@ async function task_1_21(db) {
         sum(UnitPrice * Quantity) AS 'Maximum Purchase Amount, $'
     FROM OrderDetails
     GROUP BY OrderID
-    ORDER BY sum(UnitPrice * Quantity) DESC
+    ORDER BY \`Maximum Purchase Amount, $\` DESC
     LIMIT 1;
     `);
     return result[0];
