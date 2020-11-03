@@ -87,10 +87,10 @@ async function task_1_4(db) {
     SELECT 
         CustomerID AS 'Customer Id',
         count(OrderID) AS 'Total number of Orders',
-        ROUND( count(OrderID) * 100 / (SELECT count(OrderID) FROM Orders), 5) AS '% of all orders'
+        ROUND((count(OrderID) * 100 / (SELECT count(OrderID) FROM Orders)), 5) AS '% of all orders'
     FROM Orders
     GROUP BY CustomerID
-    ORDER BY \`% of all orders\`  DESC, CustomerId;
+    ORDER BY \`% of all orders\`  DESC, CustomerID;
     `);
     return result[0];
 }
