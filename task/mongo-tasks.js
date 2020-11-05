@@ -22,6 +22,13 @@
  * */
 async function before(db) {
     await db.collection('employees').ensureIndex({CustomerID: 1});
+    await db.collection('employees').ensureIndex({EmployeeID: 1});
+    await db.collection('order-details').ensureIndex({OrderID: 1});
+    await db.collection('order-details').ensureIndex({CuctomerID: 1});
+    await db.collection('order-details').ensureIndex({UnitPrice: 1, Quantity: 1});
+    await db.collection('orders').ensureIndex({OrderID: 1});
+    await db.collection('customers').ensureIndex({CustomerID: 1});
+    await db.collection('products').ensureIndex({ProductID: 1});   
 }
 
 /**
@@ -539,7 +546,6 @@ async function task_1_17(db) {
  *       https://docs.mongodb.com/manual/reference/operator/aggregation/dateFromString/
  */
 async function task_1_18(db) {
-    // throw new Error("Not implemented");
     const result = await db.collection('orders').aggregate([
         {
             $match: {$expr: {$eq: [{$year: {$dateFromString: { "dateString": "$OrderDate"}}}, 1998]}}
@@ -583,10 +589,8 @@ async function task_1_19(db) {
             $project: {
                 _id: 0,
                 "OrderID": "$OrderID",
-                "TotalOrderAmount": {
-                    $multiply: ["$UnitPrice", "$Quantity"]
+                "TotalOrderAmount": {$multiply: ["$UnitPrice", "$Quantity"]}
             }
-        }
         }, 
         {
             $lookup: {
@@ -729,7 +733,6 @@ async function task_1_21(db) {
  *       https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/#join-conditions-and-uncorrelated-sub-queries
  */
 async function task_1_22(db) {
-    // throw new Error("Not implemented");
     const result = await db.collection('order-details').aggregate(
         [{
             $lookup: {
